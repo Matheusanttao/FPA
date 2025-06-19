@@ -1,0 +1,122 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace VERSÃO_2
+{
+    /// <summary>
+    /// Trabalho de Fundamentos de Projeto e Análise de Algoritmos - LCS com Programação Dinâmica
+    /// Autores: Daniel de Oliveira Lopes, Danilo de Oliveira Lopes, Humberto Roosevelt, Rafael Bernardoni,
+    /// Saul Eduardo Mendes, Vitor Hugo, Matheus Antão
+    /// Versão: 1.0
+    /// Data: 19/06/2025
+    /// Descrição: Programa que calcula o tamanho da maior subsequência comum (LCS) entre duas sequências de eventos.
+    /// </summary>
+    
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("=== Trabalho de FPA - LCS com Programação Dinâmica + Backtracking ===\n");
+
+            Console.Write("Informe o número de conjuntos de dados (D ≤ 10): ");
+            int quantidadeConjuntos = int.Parse(Console.ReadLine());
+
+            for (int conjunto = 1; conjunto <= quantidadeConjuntos; conjunto++)
+            {
+                Console.WriteLine($"\n--- Conjunto de Dados {conjunto} ---");
+
+                Console.Write("Digite a sequência de eventos da Helena: ");
+                string sequenciaHelena = Console.ReadLine();
+
+                Console.Write("Digite a sequência de eventos do Marcus: ");
+                string sequenciaMarcus = Console.ReadLine();
+
+                List<string> subsequenciasLCS = EncontrarTodasLCS(sequenciaHelena, sequenciaMarcus);
+
+                Console.WriteLine("\nSubsequências comuns mais longas (LCS):");
+                foreach (string subsequencia in subsequenciasLCS)
+                {
+                    Console.WriteLine(subsequencia);
+                }
+
+                // Linha em branco entre conjuntos diferentes (conforme enunciado)
+                if (conjunto < quantidadeConjuntos)
+                {
+                    Console.WriteLine();
+                }
+            }
+
+            Console.WriteLine("\nProcessamento finalizado. Pressione qualquer tecla para encerrar.");
+            Console.ReadKey();
+        }
+        /// <summary>
+        /// Função principal que encontra todas as LCS entre duas sequências.
+        /// </summary>
+        static List<string> EncontrarTodasLCS(string sequencia1, string sequencia2)
+        {
+            int m = sequencia1.Length;
+            int n = sequencia2.Length;
+
+            int[,] matrizDP = new int[m + 1, n + 1];
+
+            // Construção da matriz de Programação Dinâmica
+            for (int i = 1; i <= m; i++)
+            {
+                for (int j = 1; j <= n; j++)
+                {
+                    if (sequencia1[i - 1] == sequencia2[j - 1])
+                        matrizDP[i, j] = matrizDP[i - 1, j - 1] + 1;
+                    else
+                        matrizDP[i, j] = Math.Max(matrizDP[i - 1, j], matrizDP[i, j - 1]);
+                }
+            }
+
+            // Usando HashSet para evitar duplicatas
+            HashSet<string> resultadoFinal = new HashSet<string>();
+
+            // Iniciando o Backtracking
+            Backtracking(sequencia1, sequencia2, m, n, "", matrizDP, resultadoFinal);
+
+            // Retornando as subsequências ordenadas alfabeticamente
+            return resultadoFinal.OrderBy(s => s).ToList();
+        }
+
+        /// <summary>
+        /// Função recursiva de Backtracking para reconstruir todas as LCS possíveis.
+        /// </summary>
+        static void Backtracking(string s1, string s2, int i, int j, string lcsAtual, int[,] dp, HashSet<string> resultado)
+        {
+            // Caso base: chegou ao início de alguma string
+            if (i == 0 || j == 0)
+            {
+                if (lcsAtual.Length > 0)
+                {
+                    // Como estamos construindo de trás para frente, precisamos inverter antes de adicionar
+                    char[] arr = lcsAtual.ToCharArray();
+                    Array.Reverse(arr);
+                    resultado.Add(new string(arr));
+                }
+                return;
+            }
+
+            // Se os caracteres forem iguais, segue na diagonal
+            if (s1[i - 1] == s2[j - 1])
+            {
+                Backtracking(s1, s2, i - 1, j - 1, lcsAtual + s1[i - 1], dp, resultado);
+            }
+            else
+            {
+                // Seguir o(s) maior(es) caminho(s)
+                if (dp[i - 1, j] >= dp[i, j - 1])
+                {
+                    Backtracking(s1, s2, i - 1, j, lcsAtual, dp, resultado);
+                }
+                if (dp[i, j - 1] >= dp[i - 1, j])
+                {
+                    Backtracking(s1, s2, i, j - 1, lcsAtual, dp, resultado);
+                }
+            }
+        }
+    }
+}
