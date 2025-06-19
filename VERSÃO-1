@@ -1,0 +1,70 @@
+using System;
+
+namespace VERSÃO_1
+{   
+    /// <summary>
+    /// Trabalho de Fundamentos de Projeto e Análise de Algoritmos - LCS com Programação Dinâmica
+    /// Autores: Daniel de Oliveira Lopes, Danilo de Oliveira Lopes, Humberto Roosevelt, Rafael Bernardoni,
+    /// Saul Eduardo Mendes, Vitor Hugo, Matheus Antão
+    /// Versão: 1.0
+    /// Data: 19/06/2025
+    /// Descrição: Programa que calcula o tamanho da maior subsequência comum (LCS) entre duas sequências de eventos.
+    /// </summary>
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("=== Trabalho de FPA - LCS usando Programação Dinâmica ===\n");
+
+            // Solicita ao usuário a quantidade de conjuntos de dados a serem processados
+            Console.Write("Informe o número de conjuntos de dados (D ≤ 10): ");
+            int quantidadeConjuntos = int.Parse(Console.ReadLine());
+
+            for (int conjunto = 1; conjunto <= quantidadeConjuntos; conjunto++)
+            {
+                Console.WriteLine($"\n--- Conjunto de Dados {conjunto} ---");
+
+                Console.Write("Digite a sequência de eventos da Helena: ");
+                string sequenciaHelena = Console.ReadLine();
+
+                Console.Write("Digite a sequência de eventos do Marcus: ");
+                string sequenciaMarcus = Console.ReadLine();
+
+                int tamanhoLCS = CalcularTamanhoLCS(sequenciaHelena, sequenciaMarcus);
+
+                Console.WriteLine($"Tamanho da maior subsequência comum (LCS): {tamanhoLCS}");
+            }
+
+            Console.WriteLine("\nProcessamento finalizado. Pressione qualquer tecla para encerrar.");
+            Console.ReadKey();
+        }
+
+        static int CalcularTamanhoLCS(string sequencia1, string sequencia2)
+        {
+            int tamanho1 = sequencia1.Length;
+            int tamanho2 = sequencia2.Length;
+
+            // Matriz para armazenar os resultados parciais da programação dinâmica
+            int[,] matrizDP = new int[tamanho1 + 1, tamanho2 + 1];
+
+            // Preenchendo a matriz de forma iterativa
+            for (int i = 1; i <= tamanho1; i++)
+            {
+                for (int j = 1; j <= tamanho2; j++)
+                {
+                    if (sequencia1[i - 1] == sequencia2[j - 1])
+                    {
+                        matrizDP[i, j] = matrizDP[i - 1, j - 1] + 1;
+                    }
+                    else
+                    {
+                        matrizDP[i, j] = Math.Max(matrizDP[i - 1, j], matrizDP[i, j - 1]);
+                    }
+                }
+            }
+
+            // Retorna o valor final: o tamanho da LCS
+            return matrizDP[tamanho1, tamanho2];
+        }
+    }
+}
